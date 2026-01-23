@@ -1,0 +1,235 @@
+#!/usr/bin/env python3
+"""
+Fetch blog content from URL and convert to markdown
+"""
+
+import sys
+import re
+import os
+from urllib.parse import urlparse
+import requests
+from typing import Optional, Tuple
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
+
+try:
+    from readability import Document
+    from markdownify import markdownify
+except ImportError as e:
+    logger.error("Missing required packages. Install with: pip install readability-lxml markdownify requests")
+    sys.exit(1)
+
+
+def extract_domain(url: str) -> str:
+    """Extract domain from URL and convert to folder name"""
+    parsed = urlparse(url)
+    domain = parsed.netloc.lower()
+    # Remove common prefixes
+    domain = re.sub(r'^www\.', '', domain)
+    # Convert dots to hyphens
+    domain = domain.replace('.', '-')
+    return domain
+
+
+def extract_title(readability_doc: Document, url: str) -> str:
+    """Extract title from readability document or URL"""
+    # First try to get title from document
+    title = readability_doc.title()
+    if title and len(title.strip()) > 0:
+        title = title.strip()
+    else:
+        # Fallback to URL path
+        parsed = urlparse(url)
+        path = parsed.path.strip('/')
+        # Get last part of path or use domain
+        if path:
+            title = path.split('/')[-1]
+        else:
+            title = extract_domain(url)
+
+    # Clean title for filename
+    # Remove common suffixes
+    title = re.sub(r'\|.*$', '', title)  # Remove | Site Name
+    title = re.sub(r'-.*$', '', title)   # Remove - Site Name
+    title = re.sub(r'\s+', ' ', title)   # Normalize whitespace
+    title = title.strip()
+
+    return title
+
+
+def title_to_kebab_case(title: str) -> str:
+    """Convert title to kebab-case filename (2-6 words)"""
+    # Remove special characters except spaces and hyphens
+    title = re.sub(r'[^\w\s-]', '', title)
+
+    # Convert to lowercase
+    title = title.lower()
+
+    # Split into words
+    words = title.split()
+
+    # Limit to 2-6 words
+    if len(words) > 6:
+        words = words[:6]
+    elif len(words) < 2:
+        # If too short, add more context from the title
+        pass
+
+    # Join with hyphens
+    kebab = '-'.join(words)
+
+    # Clean up any double hyphens or trailing hyphens
+    kebab = re.sub(r'-+', '-', kebab)
+    kebab = kebab.strip('-')
+
+    return kebab
+
+
+def fetch_and_convert(url: str) -> Tuple[str, str]:
+    """Fetch URL content and convert to markdown"""
+    try:
+        logger.info(f"Fetching URL: {url}")
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        response = requests.get(url, headers=headers, timeout=30)
+        response.raise_for_status()
+
+        # Parse with readability
+        doc = Document(response.text)
+
+        # Get the main content
+        summary = doc.summary()
+
+        # Convert HTML to markdown
+        markdown_content = markdownify(summary, heading_style="ATX")
+
+        # Get title
+        title = extract_title(doc, url)
+        logger.info(f"Extracted title: {title}")
+
+        return title, markdown_content
+
+    except requests.RequestException as e:
+        logger.error(f"Failed to fetch URL: {e}")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"Error processing content: {e}")
+        sys.exit(1)
+
+
+def save_markdown(domain: str, filename: str, content: str) -> str:
+    """Save markdown content to file"""
+    # Create domain directory if it doesn't exist
+    os.makedirs(domain, exist_ok=True)
+
+    # Full path
+    filepath = os.path.join(domain, filename)
+
+    # Check if file already exists
+    if os.path.exists(filepath):
+        logger.warning(f"File already exists: {filepath}")
+        overwrite = input("File already exists. Overwrite? (y/n): ")
+        if overwrite.lower() != 'y':
+            logger.info("Operation cancelled.")
+            sys.exit(0)
+
+    # Write content
+    try:
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(content)
+        logger.info(f"Saved: {filepath}")
+        return filepath
+    except Exception as e:
+        logger.error(f"Failed to save file: {e}")
+        sys.exit(1)
+
+
+def generate_filename_from_url(url: str) -> Tuple[str, str, str]:
+    """Generate domain and filename from URL"""
+    # Extract domain
+    domain = extract_domain(url)
+
+    # Mock fetching just to get title
+    # In real usage, this would fetch the actual content
+    logger.info("Fetching content to extract title...")
+
+    # For this script, we'll actually fetch to get the real title
+    # This is a more accurate approach
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        response = requests.get(url, headers=headers, timeout=30)
+        response.raise_for_status()
+
+        doc = Document(response.text)
+        title = extract_title(doc, url)
+        kebab_title = title_to_kebab_case(title)
+
+        # Add .md extension
+        filename = f"{kebab_title}.md"
+
+        return domain, filename, title
+
+    except Exception as e:
+        logger.error(f"Error extracting title: {e}")
+        # Fallback to using URL path
+        parsed = urlparse(url)
+        path_parts = [p for p in parsed.path.split('/') if p]
+        if path_parts:
+            fallback_title = path_parts[-1].replace('-', ' ')
+            kebab_title = title_to_kebab_case(fallback_title)
+        else:
+            kebab_title = 'article'
+
+        filename = f"{kebab_title}.md"
+        return domain, filename, kebab_title
+
+
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: python fetch_blog.py <blog-url>")
+        sys.exit(1)
+
+    url = sys.argv[1]
+
+    # Validate URL
+    try:
+        result = urlparse(url)
+        if not all([result.scheme, result.netloc]):
+            logger.error("Invalid URL format")
+            sys.exit(1)
+    except Exception as e:
+        logger.error(f"Invalid URL: {e}")
+        sys.exit(1)
+
+    logger.info("Starting blog fetch and conversion...")
+
+    # Fetch content
+    title, markdown_content = fetch_and_convert(url)
+
+    # Generate filename
+    domain = extract_domain(url)
+    kebab_title = title_to_kebab_case(title)
+    filename = f"{kebab_title}.md"
+
+    logger.info(f"Domain: {domain}")
+    logger.info(f"Filename: {filename}")
+
+    # Save to file
+    filepath = save_markdown(domain, filename, markdown_content)
+
+    logger.info(f"\nSuccessfully saved English markdown to: {filepath}")
+    logger.info(f"\nNext steps:")
+    logger.info(f"1. Review and translate the content to Chinese")
+    logger.info(f"2. Save Chinese version as: {domain}/中译-{filename}")
+
+    return filepath
+
+
+if __name__ == "__main__":
+    main()
