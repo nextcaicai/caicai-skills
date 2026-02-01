@@ -64,6 +64,7 @@
 | few-shot | 少样本学习 | - |
 | multi-modal | 多模态 | - |
 | fine-tuning | 微调 | - |
+| Vibe Coding | Vibe Coding | 保持英文 |
 
 ## 使用说明
 

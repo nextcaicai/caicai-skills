@@ -18,8 +18,9 @@ logger = logging.getLogger(__name__)
 try:
     from readability import Document
     from markdownify import markdownify
+    from bs4 import BeautifulSoup
 except ImportError as e:
-    logger.error("Missing required packages. Install with: pip install readability-lxml markdownify requests")
+    logger.error("Missing required packages. Install with: pip install readability-lxml markdownify beautifulsoup4 requests")
     sys.exit(1)
 
 
@@ -88,6 +89,28 @@ def title_to_kebab_case(title: str) -> str:
     return kebab
 
 
+def clean_html_with_beautifulsoup(html: str) -> str:
+    """Use BeautifulSoup to extract article content while preserving structure"""
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # Remove script and style elements
+    for element in soup(['script', 'style', 'nav', 'header', 'footer', 'aside']):
+        element.decompose()
+
+    # Try to find article or main content area
+    article = soup.find('article') or soup.find('main') or soup.find('div', class_='entry-content')
+
+    if article:
+        return str(article)
+
+    # Fallback: find the element with the most text content
+    body = soup.find('body')
+    if body:
+        return str(body)
+
+    return str(soup)
+
+
 def fetch_and_convert(url: str) -> Tuple[str, str]:
     """Fetch URL content and convert to markdown"""
     try:
@@ -98,17 +121,24 @@ def fetch_and_convert(url: str) -> Tuple[str, str]:
         response = requests.get(url, headers=headers, timeout=30)
         response.raise_for_status()
 
-        # Parse with readability
+        # Try readability first for title extraction
         doc = Document(response.text)
-
-        # Get the main content
-        summary = doc.summary()
-
-        # Convert HTML to markdown
-        markdown_content = markdownify(summary, heading_style="ATX")
-
-        # Get title
         title = extract_title(doc, url)
+
+        # Use BeautifulSoup to extract content while preserving lists
+        html_content = clean_html_with_beautifulsoup(response.text)
+
+        # Convert HTML to markdown with options to preserve lists
+        markdown_content = markdownify(
+            html_content,
+            heading_style="ATX",
+            strip=['script', 'style'],
+            convert=['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'strong', 'em', 'code', 'pre', 'blockquote', 'img']
+        )
+
+        # Clean up excessive newlines
+        markdown_content = re.sub(r'\n{3,}', '\n\n', markdown_content)
+
         logger.info(f"Extracted title: {title}")
 
         return title, markdown_content
