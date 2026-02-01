@@ -131,9 +131,7 @@ def fetch_and_convert(url: str) -> Tuple[str, str]:
         # Convert HTML to markdown with options to preserve lists
         markdown_content = markdownify(
             html_content,
-            heading_style="ATX",
-            strip=['script', 'style'],
-            convert=['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'strong', 'em', 'code', 'pre', 'blockquote', 'img']
+            heading_style="ATX"
         )
 
         # Clean up excessive newlines
