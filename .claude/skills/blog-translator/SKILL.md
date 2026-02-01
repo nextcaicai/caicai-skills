@@ -105,11 +105,11 @@ Fixed translation prompt used in Step 2. Load this when translating English mark
 
 ### references/polishing_prompt.md
 
-Fixed polishing prompt with terminology glossary and style guidelines used in Step 3. Load this when reviewing and refining the Chinese translation.
+Fixed polishing prompt with style guidelines used in Step 3. Load this when reviewing and refining the Chinese translation.
 
-### references/glossary.md
+### assets/glossary.md
 
-Optional: Domain-specific terminology glossary for consistent translations across multiple blog translations.
+通用技术术语对照表，用于统一翻译风格。润色翻译时参考此文件确保术语一致性。针对特定领域博客，可在此文件末尾追加专业术语。
 
 ## Common Usage Scenarios
 

@@ -6,73 +6,62 @@ Use this fixed prompt with terminology glossary to review and polish Chinese tra
 
 **Polishing Prompt Template:**
 
-You are a senior Chinese editor specializing in polishing technical translations. Review and improve the following Chinese translation of a technical blog article.
+You are a senior Chinese editor specializing in polishing technical translations. Conduct a critical assessment comparing the Chinese translation with the original English text, providing specific improvement suggestions. The final translation should follow colloquial expression habits of Mainland China Simplified Chinese.
 
 **Review Guidelines:**
 
-1. **Language Quality**:
-   - Improve sentence flow and readability
-   - Ensure natural Chinese expression
-   - Check for awkward or unnatural phrasing
-   - Verify grammar and punctuation
+Conduct a comprehensive review focusing on four key dimensions:
 
-2. **Terminology Consistency**:
-   - Apply the terminology glossary below
-   - Ensure consistent use of technical terms
-   - Check proper noun translations
-   - Verify industry-standard terminology usage
+1. **Accuracy** (i):
+   - Identify and correct additions, mistranslations, omissions, and untranslated content
+   - Ensure technical concepts are accurately conveyed without distortion
+   - Check that code examples and technical terms maintain their original meaning
+   - Verify proper nouns and specialized terminology are correctly translated
 
-3. **Technical Accuracy**:
-   - Verify technical concepts are accurately conveyed
-   - Ensure code examples maintain their original meaning
-   - Check that technical explanations are clear and correct
+2. **Fluency** (ii):
+   - Follow Chinese grammar, spelling, and punctuation conventions
+   - Improve sentence flow and readability for natural Chinese expression
+   - Eliminate redundant repetitions and awkward phrasing
+   - Ensure smooth transitions between sentences and paragraphs
+   - Check for unnatural "translationese" that feels foreign to Chinese readers
 
-4. **Formatting**:
-   - Maintain all markdown formatting
-   - Ensure consistent heading levels
-   - Verify code block integrity
-   - Check list formatting and numbering
+3. **Style Adaptation** (iii):
+   - Maintain alignment with the original text's style (formal, conversational, technical, etc.)
+   - Balance technical accuracy with readability for the target audience
+   - Handle cultural context conversion appropriately - adapt idioms, examples, and references for Chinese readers when necessary
+   - Ensure the tone matches the original (e.g., if original is enthusiastic, translation should reflect that)
 
-**Terminology Glossary** (apply these consistently):
+4. **Terminology Consistency** (iv):
+   - Apply the terminology glossary below consistently throughout
+   - Ensure domain-specific terms align with professional field characteristics
+   - Use equivalent Chinese idioms and expressions where appropriate
+   - Check for consistent translation of recurring terms and concepts
 
-```
-API → API (保持英文)
-framework → 框架
-library → 库
-module → 模块
-component → 组件
-state → 状态
-props → props (保持英文)
-data structure → 数据结构
-algorithm → 算法
-performance → 性能
-optimization → 优化
-debugging → 调试
-backend → 后端
-frontend → 前端
-full-stack → 全栈
-repository → 仓库
-pull request → 拉取请求
-merge → 合并
-commit → 提交
-branch → 分支
-pattern → 模式
-debug → 调试
-runtime → 运行时
-compile time → 编译时
-type checking → 类型检查
-interface → 接口
-implementation → 实现
-abstraction → 抽象
-encapsulation → 封装
-inheritance → 继承
-polymorphism → 多态
-```
+**Additional Technical Checks:**
 
-**Add domain-specific terms as needed for the particular blog topic.**
+5. **Formatting Integrity**:
+   - Maintain all markdown formatting (headings, lists, code blocks, links, etc.)
+   - Ensure consistent heading hierarchy and levels
+   - Verify code block integrity and proper formatting
+   - Check list numbering and bullet point consistency
+   - Preserve URLs, links, and reference markers
+
+**Terminology Glossary:**
+
+参考 `assets/glossary.md` 中的术语对照表，确保全文术语翻译一致。针对特定博客主题，可添加该领域的专业术语。
 
 **Content to polish:**
 
 [CHINESE_TRANSLATION]
 
 **Output only the polished Chinese translation in markdown format.**
+
+**Critical Assessment Framework:**
+
+Before providing the final polished translation, conduct a brief analysis addressing:
+1. What are the 3 most significant issues found in the translation?
+2. Which specific sentences need restructuring for better flow?
+3. Are there any cultural references or idioms that require localization?
+4. Is the technical depth appropriate for the target audience?
+
+Then provide the polished translation that addresses these issues.
