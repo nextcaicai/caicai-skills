@@ -64,49 +64,62 @@ python3 scripts/fetch_blog.py "https://example.com/blog/understanding-machine-le
 
 ## File Organization
 
-The skill organizes files by domain with complete translation workflow artifacts:
+The skill organizes files by domain, with each article's workflow artifacts in its own subdirectory for easy management:
 
 ```
 <project-root>/
 └── <domain>/
-    └── <blog>.md              # English version (original)
-    └── 初译-<blog>.md          # First-round Chinese translation
-    └── 审校-<blog>.md          # Review report with terminology checks
-    └── 中译-<blog>.md          # Final polished Chinese version
+    └── <blog>/                    # Article folder (kebab-case title)
+        ├── 1-original.md          # English version (original)
+        ├── 2-draft.md             # First-round Chinese translation
+        ├── 3-review.md            # Review report with terminology checks
+        └── 4-final.md             # Final polished Chinese version
 ```
 
 ### Naming Convention
 
 - **Domain**: Extracted from URL (e.g., `github-com`, `medium-com`, `mp-weixin-qq-com`)
-- **English filename**: `<blog>` - Extracted from page title or URL path, converted to kebab-case, 2-6 words
-  - Examples: `understanding-machine-learning.md`, `react-hooks-guide.md`
-- **Workflow file prefixes**:
-  - `初译-` : First-round translation (raw output from Step 2)
-  - `审校-` : Review report with terminology and quality analysis (Step 3)
-  - `中译-` : Final polished translation (Step 4)
-  - Examples: `初译-react-hooks-guide.md`, `审校-react-hooks-guide.md`, `中译-react-hooks-guide.md`
+- **Article folder**: `<blog>` - Extracted from page title, converted to kebab-case, 2-6 words
+  - Examples: `understanding-machine-learning/`, `react-hooks-guide/`
+- **Workflow file naming** (numbered for workflow clarity):
+  - `1-original.md` : English original (Step 1)
+  - `2-draft.md` : First-round translation (Step 2)
+  - `3-review.md` : Review report with terminology checks (Step 3)
+  - `4-final.md` : Final polished Chinese version (Step 4)
 
 **File Naming Examples:**
 
 ```
 github-com/
-  ├── state-management-patterns.md
-  ├── 初译-state-management-patterns.md
-  ├── 审校-state-management-patterns.md
-  └── 中译-state-management-patterns.md
+  ├── state-management-patterns/
+  │   ├── 1-original.md
+  │   ├── 2-draft.md
+  │   ├── 3-review.md
+  │   └── 4-final.md
+  └── react-hooks-guide/
+      ├── 1-original.md
+      ├── 2-draft.md
+      ├── 3-review.md
+      └── 4-final.md
 
 medium-com/
-  ├── advanced-typescript-tips.md
-  ├── 初译-advanced-typescript-tips.md
-  ├── 审校-advanced-typescript-tips.md
-  └── 中译-advanced-typescript-tips.md
-
-mp-weixin-qq-com/
-  ├── wechat-mini-program-guide.md
-  ├── 初译-wechat-mini-program-guide.md
-  ├── 审校-wechat-mini-program-guide.md
-  └── 中译-wechat-mini-program-guide.md
+  ├── advanced-typescript-tips/
+  │   ├── 1-original.md
+  │   ├── 2-draft.md
+  │   ├── 3-review.md
+  │   └── 4-final.md
+  └── rust-memory-management/
+      ├── 1-original.md
+      ├── 2-draft.md
+      ├── 3-review.md
+      └── 4-final.md
 ```
+
+**Advantages of this structure:**
+- All versions of the same article are grouped together
+- Easy to locate and manage multiple articles from the same domain
+- Numbered files clearly show the workflow progression
+- Clean separation between different articles
 
 ## Scripts
 
@@ -157,14 +170,14 @@ User: "请帮我翻译并保存这个博客：https://blog.rust-lang.org/2024/01
 Workflow:
 1. Extract domain: `rust-lang-org`
 2. Run: `python3 scripts/fetch_blog.py "https://blog.rust-lang.org/2024/01/04/rust-1.75.0.html"`
-3. Save English to: `rust-lang-org/rust-1-75-0-release.md`
+3. Save English to: `rust-lang-org/rust-1-75-0-release/1-original.md`
 4. **Step 2 - First-round Translation:** Use `references/translation_prompt.md` to translate
-   - Save to: `rust-lang-org/初译-rust-1-75-0-release.md`
+   - Save to: `rust-lang-org/rust-1-75-0-release/2-draft.md`
 5. **Step 3 - Review Report:** Use `references/review_prompt.md` to generate review report
    - Check terminology against `assets/glossary.md`
-   - Save to: `rust-lang-org/审校-rust-1-75-0-release.md`
+   - Save to: `rust-lang-org/rust-1-75-0-release/3-review.md`
 6. **Step 4 - Polish:** Use `references/polishing_prompt.md` + review report to finalize
-   - Save final Chinese to: `rust-lang-org/中译-rust-1-75-0-release.md`
+   - Save final Chinese to: `rust-lang-org/rust-1-75-0-release/4-final.md`
 
 ### Scenario 2: Multiple Blogs from Same Domain
 

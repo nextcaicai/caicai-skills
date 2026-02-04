@@ -137,6 +137,14 @@ def fetch_and_convert(url: str) -> Tuple[str, str]:
         # Clean up excessive newlines
         markdown_content = re.sub(r'\n{3,}', '\n\n', markdown_content)
 
+        # Clean up "Link to heading" anchor links (e.g., [Link to heading](#anchor))
+        # These are visual noise in markdown and don't provide value for reading
+        markdown_content = re.sub(r'\[Link to heading\]\(#[^)]+\)', '', markdown_content)
+
+        # Also clean up other common anchor link patterns that are noise
+        # Pattern like: ## [](#anchor)**Heading Text**
+        markdown_content = re.sub(r'## \[\]\(#[^)]+\)', '## ', markdown_content)
+
         logger.info(f"Extracted title: {title}")
 
         return title, markdown_content
@@ -149,13 +157,17 @@ def fetch_and_convert(url: str) -> Tuple[str, str]:
         sys.exit(1)
 
 
-def save_markdown(domain: str, filename: str, content: str) -> str:
-    """Save markdown content to file"""
+def save_markdown(domain: str, article_folder: str, content: str) -> str:
+    """Save markdown content to article folder as 1-original.md"""
     # Create domain directory if it doesn't exist
     os.makedirs(domain, exist_ok=True)
 
-    # Full path
-    filepath = os.path.join(domain, filename)
+    # Create article subfolder
+    article_path = os.path.join(domain, article_folder)
+    os.makedirs(article_path, exist_ok=True)
+
+    # Full path for 1-original.md
+    filepath = os.path.join(article_path, "1-original.md")
 
     # Check if file already exists
     if os.path.exists(filepath):
@@ -245,16 +257,20 @@ def main():
     kebab_title = title_to_kebab_case(title)
     filename = f"{kebab_title}.md"
 
+    # Use kebab_title as article folder name
+    article_folder = kebab_title
+
     logger.info(f"Domain: {domain}")
-    logger.info(f"Filename: {filename}")
+    logger.info(f"Article folder: {article_folder}")
 
     # Save to file
-    filepath = save_markdown(domain, filename, markdown_content)
+    filepath = save_markdown(domain, article_folder, markdown_content)
 
     logger.info(f"\nSuccessfully saved English markdown to: {filepath}")
     logger.info(f"\nNext steps:")
-    logger.info(f"1. Review and translate the content to Chinese")
-    logger.info(f"2. Save Chinese version as: {domain}/中译-{filename}")
+    logger.info(f"1. Create first-round translation: {domain}/{article_folder}/2-draft.md")
+    logger.info(f"2. Create review report: {domain}/{article_folder}/3-review.md")
+    logger.info(f"3. Create final version: {domain}/{article_folder}/4-final.md")
 
     return filepath
 
