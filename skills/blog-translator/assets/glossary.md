@@ -65,6 +65,16 @@
 | multi-modal | 多模态 | - |
 | fine-tuning | 微调 | - |
 | Vibe Coding | Vibe Coding | 保持英文 |
+| AI product sense | AI 产品感 | 指对 AI 产品能力和局限性的直觉判断力 |
+| coding agent | AI 编程助手 | 如 Cursor、Claude Code 等 |
+| context rot | 上下文腐化 | 指上下文信息随时间推移而失效或退化 |
+| subagent | 子智能体 | 主智能体委派任务的下属智能体 |
+| agent memory | 智能体记忆 | 智能体存储和回忆信息的能力 |
+| context engineering | 上下文工程 | 优化 AI 上下文使用的设计实践 |
+| tool calling | 工具调用 | LLM 调用外部工具的能力 |
+| MCP / Model Context Protocol | 模型上下文协议（MCP） | 标准化工具接口协议 |
+| personal OS / personal operating system | 个人操作系统 | 个人使用的 AI 辅助工作系统 |
+| RAG / Retrieval-Augmented Generation | 检索增强生成 | 结合外部知识检索的生成技术 |
 
 ## 使用说明
 

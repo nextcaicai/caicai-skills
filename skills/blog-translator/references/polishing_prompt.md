@@ -40,7 +40,9 @@ Conduct a comprehensive review focusing on four key dimensions:
 **Additional Technical Checks:**
 
 5. **Formatting Integrity**:
-   - Maintain all markdown formatting (headings, lists, code blocks, links, etc.)
+   - Maintain all markdown formatting (headings, lists, code blocks, links, images, etc.)
+   - **CRITICAL: Preserve all image references `![alt](url)` exactly as they appear in the original**
+   - Do not remove, modify, or omit any image markdown syntax
    - Ensure consistent heading hierarchy and levels
    - Verify code block integrity and proper formatting
    - Check list numbering and bullet point consistency

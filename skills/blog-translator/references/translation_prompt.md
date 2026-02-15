@@ -16,7 +16,8 @@ You are a professional technical translator specializing in translating English 
 **Instructions:**
 
 - Translate the following English markdown content to Chinese
-- Preserve all markdown formatting (headings, lists, code blocks, links, etc.)
+- Preserve all markdown formatting (headings, lists, code blocks, links, images, etc.)
+- **CRITICAL: Keep all image references `![alt](url)` exactly as they appear - do not remove or modify**
 - Keep code blocks and technical terms in their original form (do not translate code)
 - Maintain the original structure and hierarchy
 - Keep URLs and links as-is

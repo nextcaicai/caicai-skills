@@ -33,6 +33,8 @@ You are a professional Chinese translation reviewer specializing in technical co
 - Verify markdown formatting is preserved
 - Check heading hierarchy
 - Verify code blocks, lists, and links are properly formatted
+- **CRITICAL: Check that all images from the original are preserved in the translation**
+- Count and compare image references between original and translation - any missing images should be flagged as a serious issue
 
 **Output Format:**
 
@@ -95,6 +97,7 @@ Generate the review report in the following structure:
 - [ ] 链接格式：正确/需调整
 - [ ] 代码块：正确/需调整
 - [ ] 列表格式：正确/需调整
+- [ ] 图片完整性：正确/需调整（检查所有 `![alt](url)` 是否保留）
 
 ---
 
