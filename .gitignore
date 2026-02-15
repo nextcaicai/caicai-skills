@@ -1,0 +1,5 @@
+# Claude local settings
+.claude/
+
+# Old skill files
+blog-translator.skill
