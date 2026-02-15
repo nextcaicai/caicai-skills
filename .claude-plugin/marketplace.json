@@ -1,0 +1,29 @@
+{
+  "name": "caicai-skills",
+  "owner": {
+    "name": "Next蔡蔡",
+    "email": "rangechoi11@gmail.com"
+  },
+  "metadata": {
+    "description": "A collection of useful skills by Next蔡蔡",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "blog-translator",
+      "source": "./",
+      "strict": false,
+      "description": "Translate English blog articles into Chinese by fetching content from URLs, converting to markdown, translating, and polishing",
+      "version": "1.0.0",
+      "author": {
+        "name": "Next蔡蔡"
+      },
+      "license": "MIT",
+      "keywords": ["blog", "translate", "translation", "chinese", "english", "markdown"],
+      "category": "productivity",
+      "skills": [
+        "./skills/blog-translator"
+      ]
+    }
+  ]
+}
