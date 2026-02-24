@@ -65,16 +65,6 @@
 | multi-modal | 多模态 | - |
 | fine-tuning | 微调 | - |
 | Vibe Coding | Vibe Coding | 保持英文 |
-| AI product sense | AI 产品感 | 指对 AI 产品能力和局限性的直觉判断力 |
-| coding agent | AI 编程助手 | 如 Cursor、Claude Code 等 |
-| context rot | 上下文腐化 | 指上下文信息随时间推移而失效或退化 |
-| subagent | 子智能体 | 主智能体委派任务的下属智能体 |
-| agent memory | 智能体记忆 | 智能体存储和回忆信息的能力 |
-| context engineering | 上下文工程 | 优化 AI 上下文使用的设计实践 |
-| tool calling | 工具调用 | LLM 调用外部工具的能力 |
-| MCP / Model Context Protocol | 模型上下文协议（MCP） | 标准化工具接口协议 |
-| personal OS / personal operating system | 个人操作系统 | 个人使用的 AI 辅助工作系统 |
-| RAG / Retrieval-Augmented Generation | 检索增强生成 | 结合外部知识检索的生成技术 |
 
 ## 使用说明
 
@@ -82,6 +72,45 @@
 2. **上下文敏感**：某些术语在不同语境下可能有不同译法（如 `commit` 作为名词时也可译为"提交记录"）
 3. **新增术语**：针对特定领域博客，可在此文件末尾追加领域专用术语
 4. **保持英文的情况**：部分技术术语（如 API、props）保持原样不翻译
+
+## 上下文工程/个人知识管理术语
+
+| English | 中文 | 备注 |
+|---------|------|------|
+| Context Engineering | 上下文工程 | AI/LLM 领域核心概念 |
+| Episodic Memory | 情景记忆 | 认知科学/AI 记忆架构术语 |
+| Progressive Disclosure | 渐进式披露 | UI/UX 和 AI 架构模式 |
+| Personal OS | 个人操作系统 | 个人知识管理概念 |
+| Digital Brain | 数字大脑 | 第二大脑概念 |
+| append-only | 仅追加（append-only） | 数据存储模式 |
+| flat-file relational model | 平面文件关系模型 | 数据模型 |
+| cross-module references | 跨模块引用 | 系统架构 |
+| routing file | 路由文件 | 文件系统架构 |
+| attention budget | 注意力预算 | LLM 上下文管理概念 |
+| lost-in-middle | 中间遗忘 | LLM 注意力曲线问题 |
+| context window | 上下文窗口 | LLM 术语 |
+| system prompt | 系统提示词 | LLM 提示工程 |
+| voice guide | 语音指南 | 写作风格指南 |
+| anti-patterns | 反模式 | 软件工程/写作术语 |
+| quality gates | 质量把关 | 工程/内容流程 |
+| ReAct loop | ReAct 循环 | AI Agent 架构模式 |
+| MCP | MCP | Model Context Protocol |
+| YAML frontmatter | YAML frontmatter | 技术术语，保留英文 |
+
+## 规范驱动开发/AI 编程术语
+
+| English | 中文 | 备注 |
+|---------|------|------|
+| spec-driven development (SDD) | 规范驱动开发 | 软件工程方法论 |
+| coding agent | 编程智能体 | AI 编程助手 |
+| coordinator agent | 协调智能体 | 多智能体系统中的协调者 |
+| spec | 规范 | specification 的缩写 |
+| ticket | 工单/ticket | 项目管理术语 |
+| design doc | 设计文档 | 软件工程文档 |
+| preference store | 偏好存储 | 状态管理概念 |
+| theme context provider | 主题上下文提供者 | React 前端概念 |
+| CSS variables | CSS 变量 | 前端样式技术 |
+| Intent | Intent | Augment Code 产品名 |
 
 ---
 
