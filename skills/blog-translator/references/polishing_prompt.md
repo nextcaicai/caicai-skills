@@ -32,6 +32,7 @@ Conduct a comprehensive review focusing on five key dimensions:
    - Use Chinese idioms and expressions naturally, not forced
    - Vary sentence structure to match Chinese writing habits (often shorter, more rhythmic sentences)
    - When the original is conversational, the translation should feel like a real person talking
+   - **Convert "adjective + abstract noun" phrases to Chinese colloquialisms**: English phrases like "meaningful communication" should become "正经交流" instead of literal "有意义的交流"; "very hesitant" should become "很不情愿" instead of "非常犹豫"
 
 4. **Style Adaptation** (iv):
    - Maintain alignment with the original text's style (formal, conversational, technical, etc.)
