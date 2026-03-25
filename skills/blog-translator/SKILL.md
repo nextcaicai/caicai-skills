@@ -34,70 +34,27 @@ python3 scripts/fetch_blog.py "https://example.com/blog/understanding-machine-le
 # Output saved to: example-com/understanding-machine-learning.md
 ```
 
-#### 复杂网站处理（反爬/需登录/JavaScript渲染）
+#### 内容抓取策略
 
-当 `fetch_blog.py` 遇到以下情况时：
-- 返回 JavaScript 错误页面（如 X.com、部分 SPA 网站）
-- 需要登录才能查看内容
-- 遇到 Cloudflare 等反爬保护
-- 内容需要滚动加载或交互后才显示
+`fetch_blog.py` 使用以下策略自动处理不同类型的网站：
 
-**请使用 dev-browser skill 协助抓取：**
+**策略 1：defuddle.md（推荐，适用于大多数网站）**
+- 自动处理 JavaScript 渲染的网站（如 X.com、Medium）
+- 使用方式：在 URL 前添加 `https://defuddle.md/`
+- 例如：`https://x.com/user/status/123` → `https://defuddle.md/x.com/user/status/123`
 
-**前置准备（关键步骤）：**
-```
-# 必须先连接到用户的 Chrome，这样才能获取已登录状态
-# 不要直接使用 dev-browser，而是先执行：
-/connect to my Chrome
-# 或让用户确认 Chrome 扩展已连接
-```
+**策略 2：直接抓取（适用于静态网站）**
+- 用于传统的技术博客、文档站点
+- 使用 Readability 提取正文内容
 
-**抓取流程：**
-1. **连接到 Chrome**（使用 dev-browser extension 模式）
-   - 确保 Chrome 扩展已安装并运行
-   - 连接到用户已登录的 Chrome 实例
+**处理流程：**
+脚本会自动尝试两种策略，优先使用 defuddle.md，失败后回退到直接抓取。
 
-2. **访问目标 URL**
-   - 使用 dev-browser 导航到文章页面
-   - 如需登录，在浏览器中完成登录流程
-   - 等待页面完全加载（包括 JavaScript 渲染内容）
-
-3. **提取内容**
-   - 使用 `getAISnapshot()` 获取页面结构
-   - 或使用 `page.evaluate()` 提取文章正文
-   - 对于长文章，可能需要滚动加载全部内容
-
-4. **保存到文件**
-   - 手动创建 `<domain>/<article>/1-original.md`
-   - 将提取的内容保存为 Markdown 格式
-   - 添加文章元数据（标题、作者、来源URL、日期）
-
-5. **继续后续步骤**
-   - 从 Step 2 开始继续翻译流程
-
-**示例场景：**
-- **X/Twitter 文章**（需要登录 + JavaScript 渲染）
-- **Medium 付费文章**（需要登录）
-- **部分技术文档站点**（需要绕过反爬）
-- **需要滚动加载的长文章**
-
-**示例命令序列：**
-```
-User: "翻译这篇 X 文章：https://x.com/username/status/123456"
-
-# 1. 先连接到 Chrome
-"connect to my Chrome"
-
-# 2. 使用 dev-browser 访问并提取内容
-"go to https://x.com/username/status/123456"
-"extract the article content"
-
-# 3. 手动保存到文件
-# 保存到 x-com/article-title/1-original.md
-
-# 4. 继续标准翻译流程
-"根据 1-original.md 进行 Step 2 翻译"
-```
+**特殊情况（需要登录的内容）：**
+对于需要登录才能查看的内容（如私密推文、付费文章）：
+1. 在浏览器中登录并查看文章
+2. 手动复制内容保存到 `<domain>/<article>/1-original.md`
+3. 从 Step 2 继续翻译流程
 
 ### Step 2: First-Round Translation (English to Chinese)
 
@@ -250,30 +207,24 @@ Workflow:
 
 When users translate multiple blogs from the same site, all files are organized under the same domain directory for easy management.
 
-### Scenario 3: Complex Site with Login/Anti-Scraping (e.g., X.com)
+### Scenario 3: Complex Site with Login Requirement (e.g., Private Content)
 
-User: "翻译这篇 X 博客：https://x.com/EricBuess/status/2019817656745128366"
+User: "翻译这篇需要登录的博客"
 
 Workflow:
-1. **Check if fetch_blog.py can handle it:**
-   - Run: `python3 scripts/fetch_blog.py "https://x.com/EricBuess/status/2019817656745128366"`
-   - If it returns "JavaScript is not available" or fails, proceed to dev-browser
+1. **尝试 fetch_blog.py：**
+   - Run: `python3 scripts/fetch_blog.py "<url>"`
+   - 对于公开内容，defuddle.md 通常可以正常处理
 
-2. **Connect to Chrome:**
-   - Prompt user: "This site requires browser automation. Connect to your Chrome?"
-   - User confirms and Chrome extension is ready
-   - Execute: `connect to my Chrome` (or equivalent)
+2. **如果抓取失败（需要登录）：**
+   - 在浏览器中手动访问并登录
+   - 复制文章内容
+   - 手动创建 `x-com/article-title/1-original.md` 并粘贴内容
 
-3. **Navigate and Extract:**
-   - Use dev-browser to navigate to the URL
-   - Wait for JavaScript rendering
-   - Extract article content using `getAISnapshot()` or `page.evaluate()`
-   - Save extracted content to `x-com/claude-code-agent-teams/1-original.md`
-
-4. **Continue with standard workflow:**
-   - Step 2: Translate to `2-draft.md`
-   - Step 3: Review to `3-review.md`
-   - Step 4: Polish to `4-final.md`
+3. **继续标准翻译流程：**
+   - Step 2: 翻译到 `2-draft.md`
+   - Step 3: 审校到 `3-review.md`
+   - Step 4: 润色到 `4-final.md`
 
 ## Implementation Notes
 
@@ -284,6 +235,10 @@ Workflow:
   - It helps identify terms that should be added to the glossary for future consistency
   - Review reports can be shared with human editors for collaborative improvement
 - **Step 4 (Polish):** Address all high and medium priority issues from the review report
+- **CRITICAL - Preserve Images:** All image references `![alt](url)` must be preserved in translation
+  - defuddle.md automatically extracts images and converts to markdown format
+  - During translation (Step 2 & 4), never remove or modify image markdown
+  - Keep images in their original positions relative to text content
 - Preserve all code blocks, URLs, and technical terms during translation
 - Maintain consistent formatting between all versions (English, 初译, 审校, 中译)
 - Check for existing files before overwriting to avoid data loss
