@@ -15,7 +15,7 @@ When user requests to save and translate an English blog:
 
 ### Step 1: Fetch Blog Content & Save as English Markdown
 
-#### 标准流程（适用于大多数技术博客）
+#### Standard Workflow (for most technical blogs)
 
 1. Extract domain from URL to determine organization directory
 2. Run `fetch_blog.py` script with the blog URL
@@ -34,27 +34,27 @@ python3 scripts/fetch_blog.py "https://example.com/blog/understanding-machine-le
 # Output saved to: example-com/understanding-machine-learning.md
 ```
 
-#### 内容抓取策略
+#### Content Fetching Strategies
 
-`fetch_blog.py` 使用以下策略自动处理不同类型的网站：
+`fetch_blog.py` uses the following strategies to handle different types of websites:
 
-**策略 1：defuddle.md（推荐，适用于大多数网站）**
-- 自动处理 JavaScript 渲染的网站（如 X.com、Medium）
-- 使用方式：在 URL 前添加 `https://defuddle.md/`
-- 例如：`https://x.com/user/status/123` → `https://defuddle.md/x.com/user/status/123`
+**Strategy 1: defuddle.md (Recommended, for most websites)**
+- Automatically handles JavaScript-rendered sites (e.g., X.com, Medium)
+- Usage: Prepend `https://defuddle.md/` to the URL
+- Example: `https://x.com/user/status/123` → `https://defuddle.md/x.com/user/status/123`
 
-**策略 2：直接抓取（适用于静态网站）**
-- 用于传统的技术博客、文档站点
-- 使用 Readability 提取正文内容
+**Strategy 2: Direct Fetch (for static sites)**
+- Used for traditional technical blogs and documentation sites
+- Extracts main content using Readability
 
-**处理流程：**
-脚本会自动尝试两种策略，优先使用 defuddle.md，失败后回退到直接抓取。
+**Processing Flow:**
+The script automatically attempts both strategies, prioritizing defuddle.md and falling back to direct fetch on failure.
 
-**特殊情况（需要登录的内容）：**
-对于需要登录才能查看的内容（如私密推文、付费文章）：
-1. 在浏览器中登录并查看文章
-2. 手动复制内容保存到 `<domain>/<article>/1-original.md`
-3. 从 Step 2 继续翻译流程
+**Special Cases (Login-required content):**
+For content requiring login (e.g., private tweets, paywalled articles):
+1. Access and view the article in a browser after logging in
+2. Manually copy the content and save to `<domain>/<article>/1-original.md`
+3. Continue with Step 2 of the translation workflow
 
 ### Step 2: First-Round Translation (English to Chinese)
 
