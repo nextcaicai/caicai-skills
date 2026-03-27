@@ -206,7 +206,114 @@ def try_direct_fetch(url: str) -> Tuple[Optional[str], Optional[str]]:
         return None, None
 
 
-def save_markdown(domain: str, article_folder: str, content: str) -> str:
+def validate_content(content: str, source_url: str) -> dict:
+    """
+    Validate fetched content for completeness
+    Returns a dict with validation results and warnings
+    """
+    issues = []
+    warnings = []
+
+    # 1. Check for empty sections (### heading followed immediately by another heading)
+    # Pattern: ### Title\n\n### or ### Title\n##
+    empty_section_pattern = r'###\s+.+?\n\n(?=###|##)'
+    empty_sections = re.findall(empty_section_pattern, content, re.MULTILINE)
+    if empty_sections:
+        section_names = [re.search(r'###\s+(.+?)\n', s).group(1).strip() for s in empty_sections if re.search(r'###\s+(.+?)\n', s)]
+        if section_names:
+            issues.append(f"Empty sections detected: {', '.join(section_names[:3])}{'...' if len(section_names) > 3 else ''}")
+
+    # 2. Count videos
+    video_count = len(re.findall(r'<video', content, re.IGNORECASE))
+    source_count = len(re.findall(r'<source[^>]+src="([^"]+\.mp4)"', content, re.IGNORECASE))
+
+    # 3. Count images
+    image_count = len(re.findall(r'!\[.*?\]\(.*?\)', content))
+
+    # 4. Count words (excluding code blocks and YAML frontmatter)
+    # Remove YAML frontmatter
+    content_without_yaml = re.sub(r'^---\n.*?---\n', '', content, flags=re.DOTALL)
+    # Remove code blocks
+    content_without_code = re.sub(r'```[\s\S]*?```', '', content_without_yaml)
+    # Count words
+    word_count = len(content_without_code.split())
+
+    # 5. Check for potential dynamic content indicators in URL
+    dynamic_domains = ['openai.com', 'x.com', 'twitter.com', 'medium.com']
+    is_likely_dynamic = any(domain in source_url.lower() for domain in dynamic_domains)
+
+    # 6. Check for specific patterns that might indicate missing content
+    # Landing Pages, Games, Dashboards sections with no content
+    if re.search(r'###\s+(Landing Pages|Games|Dashboards)\s*\n\n(?=###|##|$)', content, re.IGNORECASE):
+        issues.append("Section 'Landing Pages/Games/Dashboards' appears to be empty (may contain videos)")
+
+    # Determine overall status
+    has_issues = len(issues) > 0
+    needs_manual_check = has_issues or (is_likely_dynamic and video_count == 0)
+
+    return {
+        "is_valid": not has_issues,
+        "needs_manual_check": needs_manual_check,
+        "issues": issues,
+        "warnings": warnings,
+        "stats": {
+            "video_count": video_count,
+            "video_sources": source_count,
+            "image_count": image_count,
+            "word_count": word_count
+        },
+        "is_likely_dynamic": is_likely_dynamic
+    }
+
+
+def print_validation_report(validation: dict, filepath: str):
+    """Print content validation report"""
+    stats = validation["stats"]
+
+    print("\n" + "="*60)
+    print("CONTENT VALIDATION REPORT")
+    print("="*60)
+    print(f"File: {filepath}")
+    print(f"- Words: {stats['word_count']:,}")
+    print(f"- Videos: {stats['video_count']}")
+    if stats['video_sources'] > 0:
+        print(f"  └─ Video sources (.mp4): {stats['video_sources']}")
+    print(f"- Images: {stats['image_count']}")
+
+    if validation["issues"]:
+        print("\n⚠️  ISSUES DETECTED:")
+        for issue in validation["issues"]:
+            print(f"   • {issue}")
+
+    if validation["warnings"]:
+        print("\n⚡ WARNINGS:")
+        for warning in validation["warnings"]:
+            print(f"   • {warning}")
+
+    if validation["needs_manual_check"]:
+        print("\n" + "="*60)
+        print("🔍 MANUAL CHECK RECOMMENDED")
+        print("="*60)
+        print("The content may have missing dynamic elements (videos, galleries).")
+        print("\nTo verify and supplement:")
+        print("1. Open the original URL in your browser")
+        print("2. Check if there are videos, image galleries, or interactive elements")
+        print("3. If content is missing, use dev-browser skill:")
+        print("   - Run: connect to my Chrome")
+        print("   - Navigate to the URL")
+        print("   - Extract the complete content")
+        print("   - Save to: {filepath}")
+        print("\nCommon sites requiring manual verification:")
+        print("   • OpenAI Developers (video galleries)")
+        print("   • X/Twitter (media threads)")
+        print("   • Medium (embedded content)")
+    else:
+        print("\n✅ Content appears complete!")
+
+    print("="*60)
+
+
+def save_markdown(domain: str, article_folder: str, content: str, source_url: str = "") -> str:
     """Save markdown content to article folder as 1-original.md"""
     # Create domain directory if it doesn't exist
     os.makedirs(domain, exist_ok=True)
@@ -231,6 +338,12 @@ def save_markdown(domain: str, article_folder: str, content: str) -> str:
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write(content)
         logger.info(f"Saved: {filepath}")
+
+        # Validate content after saving
+        if source_url:
+            validation = validate_content(content, source_url)
+            print_validation_report(validation, filepath)
+
         return filepath
     except Exception as e:
         logger.error(f"Failed to save file: {e}")
@@ -288,7 +401,7 @@ def main():
     logger.info(f"Article folder: {article_folder}")
 
     # Save to file
-    filepath = save_markdown(domain, article_folder, content)
+    filepath = save_markdown(domain, article_folder, content, source_url=url)
 
     logger.info(f"\n{'='*60}")
     logger.info(f"Successfully saved English markdown to: {filepath}")

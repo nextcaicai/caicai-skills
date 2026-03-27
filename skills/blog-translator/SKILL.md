@@ -63,6 +63,20 @@ python3 scripts/fetch_blog.py "https://example.com/blog/understanding-machine-le
 3. Translate entire content maintaining technical accuracy
 4. Save the first-round translation to `<project-root>/<domain>/初译-<blog>.md`
 
+**Translation Style Guidelines:**
+
+| Content Type | Tone | Heading Style | Example |
+|--------------|------|---------------|---------|
+| X.com posts, personal essays | Casual - use "你" | 一、二、三 或 1）2）3） | 一、你没有想法，是因为干扰太多了 |
+| Technical documentation | Formal - use "您" | ## 1. ## 2. | ## 1. 系统架构概述 |
+| Corporate blogs | Formal - use "您" | ## 1. ## 2. | ## 1. 产品特性 |
+
+**Key Translation Principles:**
+- **Prioritize Chinese equivalents** over English loanwords (e.g., "brain-fried" → "大脑被榨干" rather than "brain-fried")
+- **Use modal particles** (了, 呢, 吧, 嘛) for casual content to enhance spoken feel
+- **Preserve imagery** - translate metaphors vividly rather than abstractly
+- **Break long sentences** - one English sentence often becomes 2-3 Chinese phrases
+
 ### Step 3: Generate Review Report (审校报告)
 
 1. Compare the first-round translation against the original English text
@@ -85,6 +99,13 @@ python3 scripts/fetch_blog.py "https://example.com/blog/understanding-machine-le
 3. Apply terminology glossary and address all issues from the review report
 4. Refine translation for natural flow and technical accuracy
 5. Save the final polished version to `<project-root>/<domain>/中译-<blog>.md`
+
+**Polishing Focus Areas:**
+- Verify "你" vs "您" matches the original tone
+- Check for natural modal particles in casual content
+- Ensure vivid imagery is preserved (e.g., "slot machine" → "老虎机")
+- Confirm sentence rhythm feels natural when read aloud
+- Remove consecutive "的" characters by restructuring
 
 ## File Organization
 
@@ -168,6 +189,12 @@ This script handles:
 
 Fixed translation prompt used in Step 2. Load this when translating English markdown to Chinese.
 
+**Key Features:**
+- Context-aware tone selection ("你" vs "您")
+- Imagery and metaphor translation guidance
+- Modal particles for colloquial feel
+- Sentence breaking and flow optimization
+
 ### references/review_prompt.md
 
 Structured review report prompt used in Step 3. Generates a comprehensive review report including:
@@ -180,6 +207,13 @@ Structured review report prompt used in Step 3. Generates a comprehensive review
 ### references/polishing_prompt.md
 
 Fixed polishing prompt with style guidelines used in Step 4. Load this when reviewing and refining the Chinese translation, incorporating feedback from the review report.
+
+**Key Features:**
+- Tone and register verification
+- Imagery preservation checks
+- Rhythm and flow optimization
+- Heading style adaptation
+- Redundancy removal
 
 ### assets/glossary.md
 
@@ -230,11 +264,17 @@ Workflow:
 
 - Always verify the English markdown file was created successfully before proceeding to translation
 - **Step 2 (First-round Translation):** Generate a complete but raw translation without over-polishing
+  - Choose "你" or "您" based on content type (see style guidelines table)
+  - Prioritize Chinese expressions over English loanwords
+  - Break long sentences for natural Chinese rhythm
 - **Step 3 (Review Report):** This is a critical quality gate - systematically check terminology against glossary
   - The review report serves as documentation for translation decisions
   - It helps identify terms that should be added to the glossary for future consistency
   - Review reports can be shared with human editors for collaborative improvement
 - **Step 4 (Polish):** Address all high and medium priority issues from the review report
+  - Verify tone consistency (你/您, modal particles)
+  - Ensure imagery and metaphors are vivid
+  - Check sentence rhythm and flow
 - **CRITICAL - Preserve Images:** All image references `![alt](url)` must be preserved in translation
   - defuddle.md automatically extracts images and converts to markdown format
   - During translation (Step 2 & 4), never remove or modify image markdown
