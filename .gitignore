@@ -3,3 +3,8 @@
 
 # Old skill files
 blog-translator.skill
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
