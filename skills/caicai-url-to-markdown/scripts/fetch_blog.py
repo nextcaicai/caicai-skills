@@ -151,7 +151,7 @@ def try_direct_fetch(url: str) -> Tuple[Optional[str], Optional[str]]:
         return None, None
 
 
-def save_markdown(domain: str, article_folder: str, content: str, source_url: str = "") -> str:
+def save_markdown(domain: str, article_folder: str, content: str, source_url: str = "", force: bool = False) -> str:
     """Save markdown content to article folder as 1-original.md"""
     os.makedirs(domain, exist_ok=True)
     article_path = os.path.join(domain, article_folder)
@@ -159,11 +159,22 @@ def save_markdown(domain: str, article_folder: str, content: str, source_url: st
     filepath = os.path.join(article_path, "1-original.md")
 
     if os.path.exists(filepath):
-        logger.warning(f"File already exists: {filepath}")
-        overwrite = input("File already exists. Overwrite? (y/n): ")
-        if overwrite.lower() != 'y':
-            logger.info("Operation cancelled.")
-            sys.exit(0)
+        if force:
+            logger.info(f"File exists, overwriting: {filepath}")
+        else:
+            logger.warning(f"File already exists: {filepath}")
+            # 检测是否在交互式环境
+            if not sys.stdin.isatty():
+                logger.error("Non-interactive environment detected. Use --force to overwrite.")
+                sys.exit(1)
+            try:
+                overwrite = input("File already exists. Overwrite? (y/n): ")
+                if overwrite.lower() != 'y':
+                    logger.info("Operation cancelled.")
+                    sys.exit(0)
+            except EOFError:
+                logger.error("Cannot read input in non-interactive mode. Use --force to overwrite.")
+                sys.exit(1)
 
     try:
         with open(filepath, 'w', encoding='utf-8') as f:
@@ -175,21 +186,48 @@ def save_markdown(domain: str, article_folder: str, content: str, source_url: st
         sys.exit(1)
 
 
-def main():
-    if len(sys.argv) != 2:
-        print("Usage: python fetch_blog.py <blog-url>")
-        print("\nThis script is the generic fetcher for common sites:")
-        print("  - X.com / Twitter")
-        print("  - Medium")
-        print("  - WeChat Articles (mp.weixin.qq.com)")
-        print("  - Technical blogs")
-        print("  - Static documentation sites")
-        print("\nFor special sites, use router.py or dedicated scripts:")
-        print("  - Feishu: fetch_feishu.py")
-        print("  - Zhihu: fetch_zhihu.py")
-        sys.exit(1)
+def find_git_root():
+    """从当前目录向上查找 git 根目录"""
+    current = os.getcwd()
+    while current != '/':
+        if os.path.isdir(os.path.join(current, '.git')):
+            return current
+        parent = os.path.dirname(current)
+        if parent == current:
+            break
+        current = parent
+    return None
 
-    url = sys.argv[1]
+
+def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Fetch blog content and convert to markdown')
+    parser.add_argument('url', help='Blog URL to fetch')
+    parser.add_argument('--force', '-f', action='store_true', help='Force overwrite if file exists')
+    parser.add_argument('--output-dir', '-o', default=None, help='Output directory (default: git root or current directory)')
+
+    args = parser.parse_args()
+
+    url = args.url
+    force = args.force
+
+    # 确定输出目录
+    if args.output_dir:
+        output_dir = args.output_dir
+    else:
+        # 尝试找到 git 根目录，否则使用当前目录
+        git_root = find_git_root()
+        if git_root:
+            output_dir = git_root
+            logger.info(f"Using git root as output directory: {output_dir}")
+        else:
+            output_dir = '.'
+
+    # 切换到输出目录
+    if output_dir != '.':
+        os.chdir(output_dir)
+        logger.info(f"Changed working directory to: {output_dir}")
 
     try:
         result = urlparse(url)
@@ -205,12 +243,20 @@ def main():
 
     title, content = None, None
 
-    # Strategy 1: Try defuddle.md (best for JavaScript-heavy sites)
-    title, content = try_defuddle_md(url)
+    # 判断站点类型
+    is_js_heavy_site = any(domain in url.lower() for domain in [
+        'x.com', 'twitter.com', 'medium.com', 'substack.com'
+    ])
 
-    # Strategy 2: Try direct fetch if defuddle failed
-    if content is None:
-        title, content = try_direct_fetch(url)
+    if is_js_heavy_site:
+        # JavaScript 密集型站点：只使用 defuddle.md
+        logger.info("Detected JS-heavy site, using defuddle.md only...")
+        title, content = try_defuddle_md(url)
+    else:
+        # 普通站点：先尝试 defuddle.md，失败再尝试 direct fetch
+        title, content = try_defuddle_md(url)
+        if content is None:
+            title, content = try_direct_fetch(url)
 
     if content is None:
         logger.error("Failed to fetch content from all available strategies.")
@@ -226,11 +272,14 @@ def main():
     logger.info(f"Domain: {domain}")
     logger.info(f"Article folder: {article_folder}")
 
-    filepath = save_markdown(domain, article_folder, content, source_url=url)
+    filepath = save_markdown(domain, article_folder, content, source_url=url, force=force)
 
     logger.info(f"\n{'='*60}")
     logger.info(f"Successfully saved markdown to: {filepath}")
     logger.info(f"{'='*60}")
+
+    # 输出文件路径到 stdout，方便调用者获取
+    print(filepath)
 
     return filepath
 

@@ -58,49 +58,78 @@ def is_x_url(url: str) -> bool:
     return any(re.search(p, url) for p in patterns)
 
 
-def run_script(script_name: str, url: str) -> Tuple[Optional[str], Optional[str]]:
+def run_script(script_name: str, url: str, force: bool = False) -> Tuple[Optional[str], Optional[str], str]:
     """
     运行指定的抓取脚本
-    Returns: (title, content) or (None, None)
+    Returns: (title, content, error_message) or (None, None, error_message)
     """
     script_path = os.path.join(get_script_dir(), script_name)
 
     if not os.path.exists(script_path):
-        logger.warning(f"脚本不存在: {script_path}")
-        return None, None
+        error_msg = f"脚本不存在: {script_path}"
+        logger.warning(error_msg)
+        return None, None, error_msg
 
     try:
+        cmd = [sys.executable, script_path, url]
+        if force:
+            cmd.append('--force')
+
         result = subprocess.run(
-            [sys.executable, script_path, url],
+            cmd,
             capture_output=True,
             text=True,
             timeout=120
         )
 
         if result.returncode != 0:
-            logger.warning(f"{script_name} 执行失败: {result.stderr}")
-            return None, None
+            error_msg = f"{script_name} 执行失败 (exit code {result.returncode}):\n"
+            if result.stderr:
+                error_msg += f"STDERR:\n{result.stderr}\n"
+            if result.stdout:
+                error_msg += f"STDOUT:\n{result.stdout}"
+            logger.warning(error_msg)
+            return None, None, error_msg
 
-        content = result.stdout
-
-        # 从内容中提取标题
+        # 最后一行是文件路径，前面是日志输出
+        lines = result.stdout.strip().split('\n')
+        content = None
         title = "untitled"
-        for line in content.split('\n')[:30]:
-            if line.startswith('# '):
-                title = line[2:].strip()
-                break
-            if line.startswith('## '):
-                title = line[3:].strip()
-                break
 
-        return title, content
+        # 尝试读取输出的文件路径并获取内容
+        if lines:
+            potential_path = lines[-1].strip()
+            if potential_path.endswith('.md') and os.path.exists(potential_path):
+                try:
+                    with open(potential_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                    # 从内容中提取标题
+                    for line in content.split('\n')[:30]:
+                        if line.startswith('title:'):
+                            title = line.split(':', 1)[1].strip().strip('"\'')
+                            break
+                        if line.startswith('# '):
+                            title = line[2:].strip()
+                            break
+                        if line.startswith('## '):
+                            title = line[3:].strip()
+                            break
+                except Exception as e:
+                    logger.warning(f"读取文件失败: {e}")
+                    content = result.stdout
+            else:
+                content = result.stdout
+
+        return title, content, ""
 
     except subprocess.TimeoutExpired:
-        logger.warning(f"{script_name} 执行超时")
-        return None, None
+        error_msg = f"{script_name} 执行超时"
+        logger.warning(error_msg)
+        return None, None, error_msg
     except Exception as e:
-        logger.warning(f"{script_name} 执行出错: {e}")
-        return None, None
+        error_msg = f"{script_name} 执行出错: {e}"
+        logger.warning(error_msg)
+        return None, None, error_msg
 
 
 def route(url: str) -> Tuple[str, str]:
@@ -124,41 +153,42 @@ def route(url: str) -> Tuple[str, str]:
     return 'fetch_blog.py', '通用方案 (defuddle/direct)'
 
 
-def fetch(url: str) -> Tuple[Optional[str], Optional[str]]:
+def fetch(url: str, force: bool = False) -> Tuple[Optional[str], Optional[str], str]:
     """
     主入口：路由并执行抓取
-    Returns: (title, content) or (None, None)
+    Returns: (title, content, error_message) or (None, None, error_message)
     """
     script, description = route(url)
     logger.info(f"路由决策: {description} -> {script}")
 
-    return run_script(script, url)
+    return run_script(script, url, force)
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python router.py <url>")
-        print("\n路由规则:")
-        print("  - 飞书文档      -> fetch_feishu.py (Open API)")
-        print("  - 知乎文章      -> fetch_zhihu.py (Playwright)")
-        print("  - 微信公众号    -> fetch_blog.py (通用方案)")
-        print("  - X/Twitter     -> fetch_blog.py (通用方案)")
-        print("  - 其他站点      -> fetch_blog.py (自动选择最佳策略)")
-        sys.exit(1)
+    import argparse
 
-    url = sys.argv[1]
+    parser = argparse.ArgumentParser(description='URL to Markdown Router')
+    parser.add_argument('url', help='URL to fetch')
+    parser.add_argument('--force', '-f', action='store_true', help='Force overwrite if file exists')
+    parser.add_argument('--verbose', '-v', action='store_true', help='Show verbose output')
+
+    args = parser.parse_args()
+
+    url = args.url
     script, description = route(url)
 
     print(f"URL: {url}")
     print(f"路由: {description} ({script})")
     print("-" * 50)
 
-    title, content = fetch(url)
+    title, content, error_msg = fetch(url, force=args.force)
 
     if content:
         print(content)
     else:
         print("抓取失败", file=sys.stderr)
+        if error_msg:
+            print(f"\n错误详情:\n{error_msg}", file=sys.stderr)
         sys.exit(1)
 
 
