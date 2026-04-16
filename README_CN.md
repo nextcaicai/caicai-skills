@@ -44,6 +44,7 @@ npx skills add nextcaicai/caicai-skills
 # 安装特定技能
 /plugin install caicai-blog-translator@caicai-skills
 /plugin install caicai-url-to-markdown@caicai-skills
+/plugin install caicai-svg-to-png@caicai-skills
 ```
 
 或直接告诉 Claude Code：
@@ -156,6 +157,51 @@ npm install -g puppeteer-extra puppeteer-extra-plugin-stealth
 ```
 
 示例：`x-com/article-title/1-original.md`
+
+---
+
+### 工具技能
+
+#### caicai-svg-to-png（SVG 转 PNG）
+
+将 SVG 文件转换为 PNG 格式，支持智能模式检测。可生成 Chrome 扩展图标（4 种尺寸）或单张 PNG。
+
+```bash
+# 转换为 Chrome 扩展图标（自动检测）
+Convert myicon.svg to Chrome extension icons
+
+# 转换为单张 PNG（自动检测）
+Convert myicon.svg to PNG
+
+# 指定尺寸
+Convert logo.svg to PNG at 256x256
+```
+
+**功能特性**：
+- 智能意图检测（Chrome 扩展 vs 单张 PNG）
+- Chrome 扩展模式：生成 16x16、32x32、48x48、128x128 图标
+- 单张 PNG 模式：可自定义尺寸（默认 512x512）
+- 使用 Sharp 库进行高质量转换
+- 按 SVG 文件名自动创建文件夹
+
+**模式对比**：
+
+| 模式 | 触发关键词 | 输出 |
+|------|------------|------|
+| Chrome 扩展 | "Chrome extension"、"manifest.json icons"、"插件图标" | 4 张 PNG（16、32、48、128） |
+| 单张 PNG | "svg to png"、"convert svg"（无扩展上下文） | 1 张 PNG（尺寸可定制） |
+
+**输出结构**：
+```
+myicon/
+├── icon16.png      (Chrome 扩展模式)
+├── icon32.png
+├── icon48.png
+└── icon128.png
+
+logo/
+└── logo.png        (单张 PNG 模式，默认 512x512)
+```
 
 ---
 

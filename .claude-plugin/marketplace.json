@@ -10,7 +10,7 @@
   },
   "plugins": [
     {
-      "name": "blog-translator",
+      "name": "caicai-blog-translator",
       "source": "./",
       "strict": false,
       "description": "Translate English blog articles into Chinese by fetching content from URLs, converting to markdown, translating, and polishing",
@@ -22,7 +22,39 @@
       "keywords": ["blog", "translate", "translation", "chinese", "english", "markdown"],
       "category": "productivity",
       "skills": [
-        "./skills/blog-translator"
+        "./skills/caicai-blog-translator"
+      ]
+    },
+    {
+      "name": "caicai-url-to-markdown",
+      "source": "./",
+      "strict": false,
+      "description": "Convert URLs to clean Markdown format with automatic routing to the best fetching strategy for various sites",
+      "version": "1.0.0",
+      "author": {
+        "name": "Next蔡蔡"
+      },
+      "license": "MIT",
+      "keywords": ["url", "markdown", "fetch", "scrape", "content"],
+      "category": "productivity",
+      "skills": [
+        "./skills/caicai-url-to-markdown"
+      ]
+    },
+    {
+      "name": "caicai-svg-to-png",
+      "source": "./",
+      "strict": false,
+      "description": "Convert SVG files to PNG format with smart mode detection for Chrome extension icons or single PNG output",
+      "version": "1.0.0",
+      "author": {
+        "name": "Next蔡蔡"
+      },
+      "license": "MIT",
+      "keywords": ["svg", "png", "convert", "image", "chrome extension", "icon"],
+      "category": "utility",
+      "skills": [
+        "./skills/caicai-svg-to-png"
       ]
     }
   ]

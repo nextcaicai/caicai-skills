@@ -44,6 +44,7 @@ Then install skills via Browse UI:
 # Install specific skill
 /plugin install caicai-blog-translator@caicai-skills
 /plugin install caicai-url-to-markdown@caicai-skills
+/plugin install caicai-svg-to-png@caicai-skills
 ```
 
 Or simply tell Claude Code:
@@ -156,6 +157,51 @@ npm install -g puppeteer-extra puppeteer-extra-plugin-stealth
 ```
 
 Example: `x-com/article-title/1-original.md`
+
+---
+
+### Utility Skills
+
+#### caicai-svg-to-png
+
+Convert SVG files to PNG format with smart mode detection. Supports Chrome extension icons (4 sizes) or single PNG output.
+
+```bash
+# Convert to Chrome extension icons (auto-detected)
+Convert myicon.svg to Chrome extension icons
+
+# Convert to single PNG (auto-detected)
+Convert myicon.svg to PNG
+
+# With specific size
+Convert logo.svg to PNG at 256x256
+```
+
+**Features**:
+- Smart intent detection (Chrome extension vs. single PNG)
+- Chrome extension mode: generates 16x16, 32x32, 48x48, 128x128 icons
+- Single PNG mode: customizable size (default 512x512)
+- High-quality conversion using Sharp library
+- Automatic folder creation organized by SVG filename
+
+**Modes**:
+
+| Mode | Trigger | Output |
+|------|---------|--------|
+| Chrome Extension | "Chrome extension", "manifest.json icons", "plugin icon" | 4 PNG files (16, 32, 48, 128) |
+| Single PNG | "svg to png", "convert svg" (no extension context) | 1 PNG file (customizable size) |
+
+**Output Structure**:
+```
+myicon/
+├── icon16.png      (Chrome extension mode)
+├── icon32.png
+├── icon48.png
+└── icon128.png
+
+logo/
+└── logo.png        (Single PNG mode, 512x512 default)
+```
 
 ---
 
