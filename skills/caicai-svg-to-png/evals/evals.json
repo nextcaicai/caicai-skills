@@ -1,0 +1,23 @@
+{
+  "skill_name": "svg-to-chrome-icons",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Convert my logo.svg to Chrome extension icons",
+      "expected_output": "Generate icon16.png, icon32.png, icon48.png, icon128.png in the project root directory",
+      "files": ["test-logo.svg"]
+    },
+    {
+      "id": 2,
+      "prompt": "I need browser extension icons from my icon.svg file for manifest.json",
+      "expected_output": "Convert SVG to four PNG sizes and save as icon16.png, icon32.png, icon48.png, icon128.png",
+      "files": ["test-icon.svg"]
+    },
+    {
+      "id": 3,
+      "prompt": "Turn this reading.svg into Chrome extension icon files",
+      "expected_output": "Generate all four standard Chrome extension icon PNGs with correct naming",
+      "files": ["test-reading.svg"]
+    }
+  ]
+}
