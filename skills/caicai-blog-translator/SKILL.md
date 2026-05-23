@@ -1,5 +1,5 @@
 ---
-name: blog-translator
+name: caicai-blog-translator
 description: Translate English blog articles into Chinese by fetching content from URLs, converting to markdown, translating, and polishing. Use when users want to save and translate English blog articles, generate bilingual markdown files, or organize blog content by domain.
 ---
 
@@ -15,46 +15,15 @@ When user requests to save and translate an English blog:
 
 ### Step 1: Fetch Blog Content & Save as English Markdown
 
-#### Standard Workflow (for most technical blogs)
+**使用 caicai-url-to-markdown skill 处理此步骤：**
 
-1. Extract domain from URL to determine organization directory
-2. Run `fetch_blog.py` script with the blog URL
-3. Script will:
-   - Extract article title (prefer HTML title tag, fallback to URL path)
-   - Get main article content and convert to clean markdown
-   - Generate filename in kebab-case from title (2-6 words)
-   - Save to `<project-root>/<domain>/<blog>.md`
+1. 运行 `python3 scripts/fetch_blog.py "<blog-url>"` 抓取内容
+2. 内容保存为 `<domain>/<blog>/1-original.md`
+3. 验证英文 markdown 文件创建成功后再继续
 
-**Example:**
-```bash
-# User: "Translate and save this blog: https://example.com/blog/understanding-machine-learning"
-# Run:
-python3 scripts/fetch_blog.py "https://example.com/blog/understanding-machine-learning"
+详细说明见 [caicai-url-to-markdown skill](./caicai-url-to-markdown)。
 
-# Output saved to: example-com/understanding-machine-learning.md
-```
-
-#### Content Fetching Strategies
-
-`fetch_blog.py` uses the following strategies to handle different types of websites:
-
-**Strategy 1: defuddle.md (Recommended, for most websites)**
-- Automatically handles JavaScript-rendered sites (e.g., X.com, Medium)
-- Usage: Prepend `https://defuddle.md/` to the URL
-- Example: `https://x.com/user/status/123` → `https://defuddle.md/x.com/user/status/123`
-
-**Strategy 2: Direct Fetch (for static sites)**
-- Used for traditional technical blogs and documentation sites
-- Extracts main content using Readability
-
-**Processing Flow:**
-The script automatically attempts both strategies, prioritizing defuddle.md and falling back to direct fetch on failure.
-
-**Special Cases (Login-required content):**
-For content requiring login (e.g., private tweets, paywalled articles):
-1. Access and view the article in a browser after logging in
-2. Manually copy the content and save to `<domain>/<article>/1-original.md`
-3. Continue with Step 2 of the translation workflow
+**Script location:** `.claude/skills/blog-translator/scripts/fetch_blog.py`
 
 ### Step 2: First-Round Translation (English to Chinese)
 

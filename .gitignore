@@ -1,8 +1,18 @@
 # Claude local settings
 .claude/
 
-# Old skill files
-blog-translator.skill
+# 翻译文档（域名目录）
+anthropic-com/
+defuddle-md/
+developers-openai-com/
+jiahejiaoyu-feishu-cn/
+mariozechner-at/
+medium-com/
+mitchellh-com/
+mloasisblog-com/
+mp-weixin-qq-com/
+my-feishu-cn/
+x-com/
 
 # Python
 __pycache__/

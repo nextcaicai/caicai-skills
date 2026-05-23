@@ -56,6 +56,22 @@
       "skills": [
         "./skills/caicai-svg-to-png"
       ]
+    },
+    {
+      "name": "caicai-goal-prompt",
+      "source": "./",
+      "strict": false,
+      "description": "Turn rough requirements into Codex /goal commands or portable agent goal prompts using objective, scope, constraints, acceptance, and blocked handling",
+      "version": "1.0.0",
+      "author": {
+        "name": "Next蔡蔡"
+      },
+      "license": "MIT",
+      "keywords": ["goal", "prompt", "codex", "planning", "productivity", "task"],
+      "category": "productivity",
+      "skills": [
+        "./skills/caicai-goal-prompt"
+      ]
     }
   ]
 }

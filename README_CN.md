@@ -45,6 +45,7 @@ npx skills add nextcaicai/caicai-skills
 /plugin install caicai-blog-translator@caicai-skills
 /plugin install caicai-url-to-markdown@caicai-skills
 /plugin install caicai-svg-to-png@caicai-skills
+/plugin install caicai-goal-prompt@caicai-skills
 ```
 
 或直接告诉 Claude Code：
@@ -201,6 +202,29 @@ myicon/
 
 logo/
 └── logo.png        (单张 PNG 模式，默认 512x512)
+```
+
+#### caicai-goal-prompt（Goal 提示词编写）
+
+将粗略需求加工成可直接使用的 Codex `/goal` 指令，或其它 AI 平台可用的 `Goal:` 目标提示词。
+
+```bash
+# 生成 Codex /goal 指令
+caicai-goal-prompt: 修复这个 Chrome 插件的跨域问题
+
+# 生成跨平台 Agent 目标提示词
+caicai-goal-prompt: 把这个需求改成其它平台也能用的 goal
+```
+
+**功能特性**：
+- 将模糊需求改写成可执行的目标提示词
+- 按五个核心原则补齐：目标、范围、约束、验收、卡住处理
+- 支持 Codex `/goal` 格式和跨平台 `Goal:` 格式
+- 适用于 bug 修复、功能实现、重构、问题调查和前端任务
+
+**输出示例**：
+```text
+/goal 把 p95 结账延迟降到 120 毫秒以下。范围：只能使用结账服务、基准测试装置和相关测试；不改无关服务或基础设施。约束：使用结账链路内的安全性能优化，保持正确性测试套件全过，避免跳过校验、弱化一致性或只优化基准测试假象。验收：结账基准测试显示 p95 < 120 毫秒，且正确性测试套件全过。每次迭代之间，记录改了什么、基准测试显示什么、以及下一个要试的最佳实验。如果基准测试跑不起来或者没路可走了，停下来报告试过哪些路、收集了什么证据、卡在哪里了，以及下一步需要什么输入。
 ```
 
 ---

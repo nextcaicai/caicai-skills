@@ -45,6 +45,7 @@ Then install skills via Browse UI:
 /plugin install caicai-blog-translator@caicai-skills
 /plugin install caicai-url-to-markdown@caicai-skills
 /plugin install caicai-svg-to-png@caicai-skills
+/plugin install caicai-goal-prompt@caicai-skills
 ```
 
 Or simply tell Claude Code:
@@ -201,6 +202,29 @@ myicon/
 
 logo/
 └── logo.png        (Single PNG mode, 512x512 default)
+```
+
+#### caicai-goal-prompt
+
+Turn rough requirements into ready-to-use Codex `/goal` commands or portable agent goal prompts.
+
+```bash
+# Generate a Codex /goal command
+caicai-goal-prompt: Fix this Chrome extension CORS issue
+
+# Generate a portable agent prompt for other platforms
+caicai-goal-prompt: Make this requirement usable outside Codex
+```
+
+**Features**:
+- Converts vague requests into executable goal prompts
+- Applies the five core goal principles: objective, scope, constraints, acceptance, and blocked handling
+- Supports Codex `/goal` format and portable `Goal:` format
+- Useful for bug fixes, feature work, refactors, investigations, and frontend tasks
+
+**Example Output**:
+```text
+/goal Reduce p95 checkout latency below 120ms. Scope: only use the checkout service, benchmark harness, and related tests; do not change unrelated services or infrastructure. Constraints: use safe checkout-path performance optimizations, keep the correctness test suite fully passing, and avoid skipping checks or optimizing only the benchmark artifact. Acceptance: the checkout benchmark shows p95 < 120ms and the correctness test suite passes. Between iterations, record what changed, what the benchmark showed, and the next best experiment. If the benchmark cannot run or no viable path remains, stop and report attempted paths, evidence collected, blocker, and needed input.
 ```
 
 ---
